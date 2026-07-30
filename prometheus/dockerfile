@@ -5,5 +5,16 @@ FROM prom/prometheus:${VERSION}
 # Copy the prom.yml configuration file to the container
 COPY prom.yml /etc/prometheus/prom.yml
 
-# Command to run Prometheus
-CMD ["--config.file=/etc/prometheus/prom.yml", "--storage.tsdb.path=/prometheus"]
+# The scrape token for the ScoutWorks API is injected at runtime and never
+# committed — this repo is public, and Prometheus does not interpolate env vars
+# inside its config file. So write it to the path prom.yml's credentials_file
+# points at, then hand off to Prometheus.
+#
+# /prometheus is the Railway volume mount, writable by the image's `nobody` user.
+# The `:?` guard fails the boot loudly rather than starting a Prometheus that
+# silently 401s on every scrape.
+#
+# ENTRYPOINT is reset because the base image sets it to /bin/prometheus, which
+# would otherwise swallow the shell command below.
+ENTRYPOINT []
+CMD ["/bin/sh", "-c", "set -eu; : \"${METRICS_AUTH_TOKEN:?set METRICS_AUTH_TOKEN on the Prometheus service}\"; printf '%s' \"$METRICS_AUTH_TOKEN\" > /prometheus/metrics_token; chmod 600 /prometheus/metrics_token; exec /bin/prometheus --config.file=/etc/prometheus/prom.yml --storage.tsdb.path=/prometheus"]

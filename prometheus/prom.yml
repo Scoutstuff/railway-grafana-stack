@@ -1,21 +1,32 @@
 global:
   scrape_interval: 15s # Default scrape interval
+  external_labels:
+    monitor: 'scoutworks'
 
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  # - job_name: 'example_api'
-  #   scheme: http
-  #   static_configs:
-  #     - targets: ['example_api:9091']
-
-  #  ? TODO: add your services here
-  # - job_name: 'your-job-name'
-  #   scheme: https
-  #   static_configs:
-  #     - targets: ['URL_GOES_HERE']
-  #   basic_auth:
-  #     username: HTTP_AUTH_USERNAME_GOES_HERE
-  #     password: HTTP_AUTH_PASSWORD_GOES_HERE
+  # ScoutWorks API (Railway project ScoutWorks_App, production).
+  #
+  # Scraped over the public internet because Railway private networking does not
+  # cross projects — the API lives in a different project to this stack. The
+  # endpoint is bearer-authenticated (server/src/routes/metrics.ts) and rate
+  # limited to 30 req/60s, so the 30s interval below leaves ample headroom.
+  #
+  # Prometheus has no env-var interpolation in config files and this repo is
+  # public, so the token is NOT stored here. It is written to credentials_file at
+  # container start from the METRICS_AUTH_TOKEN service variable — see dockerfile.
+  - job_name: 'scoutworks-api'
+    scheme: https
+    metrics_path: /metrics
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['api.scoutworks.app']
+        labels:
+          env: production
+          service: scoutworks-api
+    authorization:
+      type: Bearer
+      credentials_file: /prometheus/metrics_token
