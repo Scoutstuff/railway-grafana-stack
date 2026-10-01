@@ -1,0 +1,25 @@
+grafana/dockerfile
+  s_f546c818f26db7::t_4b0432bd58e41c 1
+loki/dockerfile
+  s_f546c818f26db7::t_b78ce456609283 1
+loki/loki.yml
+  s_f546c818f26db7::t_b148668d4b3dff 28-56
+prometheus/dockerfile
+  s_f546c818f26db7::t_b3a7f6f3450819 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "03ee085302943d69081054c38f271b0ec96147ba",
+  "prompts": {},
+  "sessions": {
+    "s_f546c818f26db7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "94edb70f-a10f-4fce-b047-281c8501669a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "djf1982 <138519957+djf1982@users.noreply.github.com>"
+    }
+  }
+}
