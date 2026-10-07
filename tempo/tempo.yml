@@ -4,6 +4,8 @@ server:
 compactor:
   compaction:
     compaction_window: 1h
+    # Keep traces 7 days (SCO-3462). Unset, Tempo keeps 14 days.
+    block_retention: 168h
 
 storage:
   trace:
@@ -12,8 +14,9 @@ storage:
       path: /var/tempo/traces
 
 distributor:
+  # Off: on, Tempo writes every span it receives into its own log.
   log_received_spans:
-        enabled: true
+    enabled: false
   receivers:
     otlp:
       protocols:
