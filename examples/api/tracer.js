@@ -1,7 +1,7 @@
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { Resource } from "@opentelemetry/resources";
+import { resourceFromAttributes } from "@opentelemetry/resources";
 
 const tempoUrl = process.env.TEMPO_URL || "http://tempo:4318";
 const tempoIngestAPIUrl = `${tempoUrl}/v1/traces`;
@@ -13,7 +13,7 @@ const traceExporter = new OTLPTraceExporter({
 
 // Create and register the SDK
 const sdk = new NodeSDK({
-  resource: new Resource({
+  resource: resourceFromAttributes({
     "service.name": process.env.TEMPO_SERVICE_NAME || 'unknown',
   }),
   traceExporter: traceExporter,
